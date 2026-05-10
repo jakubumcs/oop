@@ -1,35 +1,24 @@
-// Ellipse również dziedziczy po Shape - tak samo jak Polygon.
-// Obie klasy są "rodzajem" Shape, ale implementują toSvg() INACZEJ.
-// To jest właśnie POLIMORFIZM - ta sama metoda, różne zachowanie w zależności od obiektu.
-// Zasada: polimorfizm pozwala pisać kod ogólny (operujący na Shape),
-//         który automatycznie robi właściwą rzecz dla każdego konkretnego kształtu.
+import java.util.Locale;
 
-public class Ellipse extends Shape {
+public class Ellipse implements Shape {
+    private Vec2 center;
+    private double rx, ry;
 
-    private Point center;
-    private double radiusX;
-    private double radiusY;
-
-    public Ellipse(Point center, double radiusX, double radiusY, Style style) {
-        // Wywołanie konstruktora Shape - obowiązkowe jako pierwsza instrukcja
-        super(style);
-        this.center = new Point(center);
-        this.radiusX = radiusX;
-        this.radiusY = radiusY;
-    }
-
-    // Implementacja metody abstrakcyjnej z Shape.
-    // Gdybyśmy jej nie napisali, kompilator zgłosiłby błąd -
-    // nie można stworzyć nieabstrakcyjnej klasy bez implementacji wszystkich metod abstrakcyjnych.
-    @Override
-    public String toSvg() {
-        return "<ellipse cx=\"" + center.getX() + "\" cy=\"" + center.getY()
-                + "\" rx=\"" + radiusX + "\" ry=\"" + radiusY
-                + "\" " + style.toSvg() + " />";
+    public Ellipse(Vec2 center, double rx, double ry) {
+        this.center = center;
+        this.rx = rx;
+        this.ry = ry;
     }
 
     @Override
-    public String toString() {
-        return "Ellipse(center=" + center + ", rx=" + radiusX + ", ry=" + radiusY + ")";
+    public BoundingBox boundingBox() {
+        return new BoundingBox(center.x() - rx, center.y() - ry, rx * 2, ry * 2);
+    }
+
+    @Override
+    public String toSvg(String params) {
+        return String.format(Locale.ENGLISH,
+                "<ellipse rx=\"%f\" ry=\"%f\" cx=\"%f\" cy=\"%f\" %s/>",
+                rx, ry, center.x(), center.y(), params);
     }
 }

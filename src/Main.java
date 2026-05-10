@@ -1,36 +1,58 @@
+import java.io.IOException;
+
 public class Main {
+    public static void main(String[] args) throws IOException {
 
-    public static void main(String[] args) throws Exception {
-        // Zadanie 1 - Style + Polygon ze stylem
-        Style redStyle = new Style("red", "darkred", 2.0);
-        Point[] pts1 = {new Point(10, 10), new Point(100, 10), new Point(55, 80)};
-        Polygon triangle = new Polygon(pts1, redStyle);
-        System.out.println(triangle.toSvg());
+        // Zadanie 1 - SolidFilledPolygon (dziedziczenie po Polygon)
+        SolidFilledPolygon filledTriangle = new SolidFilledPolygon(new Vec2[]{
+                new Vec2(0, 0),
+                new Vec2(300, 0),
+                new Vec2(150, 250)
+        }, "tomato");
 
-        // Zadanie 1 - Polygon bez stylu (domyślny)
-        Point[] pts2 = {new Point(120, 20), new Point(200, 20), new Point(160, 90)};
-        Polygon triangle2 = new Polygon(pts2);
-        System.out.println(triangle2.toSvg());
+        // Zadanie 2 - dekorator fill na Polygon i Ellipse
+        // Ten sam dekorator działa dla obu typów - to przewaga wzorca Dekorator nad dziedziczeniem.
+        Shape filledRectangle = new SolidFillShapeDecorator(
+                new Polygon(new Vec2[]{
+                        new Vec2(350, 0),
+                        new Vec2(750, 0),
+                        new Vec2(750, 200),
+                        new Vec2(350, 200)
+                }), "steelblue");
 
-        // Zadanie 2 - perpendicular + square
-        Segment diagonal = new Segment(new Point(50, 50), new Point(150, 150));
-        Style blueStyle = new Style("lightblue", "blue", 1.5);
-        Polygon sq = Segment.square(diagonal, blueStyle);
-        System.out.println("Kwadrat: " + sq.toSvg());
+        Shape filledEllipse = new SolidFillShapeDecorator(
+                new Ellipse(new Vec2(500, 700), 400, 100),
+                "gold");
 
-        // Zadanie 4 - Ellipse
-        Style ellipseStyle = new Style("yellow", "orange", 2.0);
-        Ellipse ellipse = new Ellipse(new Point(100, 100), 60, 30, ellipseStyle);
-        System.out.println(ellipse.toSvg());
+        // Zadanie 3 - dekoratory można nakładać na siebie (Stroke na SolidFill)
+        Shape styledPentagon = new StrokeShapeDecorator(
+                new SolidFillShapeDecorator(
+                        new Polygon(new Vec2[]{
+                                new Vec2(0, 260),
+                                new Vec2(100, 460),
+                                new Vec2(300, 560),
+                                new Vec2(500, 460),
+                                new Vec2(600, 260)
+                        }), "mediumseagreen"),
+                "darkgreen", 3.0);
 
-        // Zadanie 4 - SvgScene z Shape (polimorfizm)
+        Shape styledEllipse = new StrokeShapeDecorator(filledEllipse, "darkorange", 2.0);
+
+        // Zadanie 4 - Builder buduje TransformationDecorator krok po kroku (method chaining)
+        Shape transformedTriangle = new TransformationDecorator.Builder()
+                .translate(new Vec2(50, 50))
+                .rotate(15, new Vec2(150, 125))
+                .scale(new Vec2(0.8, 0.8))
+                .build(filledTriangle);
+
         SvgScene scene = new SvgScene();
-        scene.addShape(triangle);
-        scene.addShape(sq);
-        scene.addShape(ellipse);
+        scene.addShape(transformedTriangle);
+        scene.addShape(filledRectangle);
+        scene.addShape(styledPentagon);
+        scene.addShape(styledEllipse);
+        scene.save("result.svg");
 
-        scene.save("output.svg");
-        System.out.println("Zapisano output.svg");
+        System.out.println("Zapisano result.svg");
         System.out.println(scene.toSvg());
     }
 }
