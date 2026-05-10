@@ -1,4 +1,3 @@
-// Zadanie 2
 public class Segment {
 
     private Point start;
@@ -9,7 +8,6 @@ public class Segment {
         this.end = new Point(end);
     }
 
-    // Zadanie 2 - akcesory
     public Point getStart() { return new Point(start); }
     public Point getEnd()   { return new Point(end); }
 
@@ -19,20 +17,22 @@ public class Segment {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Zadanie 2 - odcinek prostopadły, tej samej długości, przecinający się w środkach
     public Segment perpendicular() {
         double mx = (start.getX() + end.getX()) / 2.0;
         double my = (start.getY() + end.getY()) / 2.0;
         double dx = (end.getX() - start.getX()) / 2.0;
         double dy = (end.getY() - start.getY()) / 2.0;
-        // Obrót o 90° : (dx, dy) -> (-dy, dx)
         return new Segment(
             new Point(mx + dy, my - dx),
             new Point(mx - dy, my + dx)
         );
     }
 
-    // Zadanie 2 - statyczna metoda wytwórcza kwadratu
+    // STATYCZNA METODA WYTWÓRCZA (static factory method)
+    // Zamiast new Polygon(...) wywołujemy Segment.square(...).
+    // Zalety: ma opisową nazwę ("square" mówi co robi), może zwrócić null lub podtyp,
+    //         ukrywa złożoność tworzenia obiektu.
+    // Zasada: gdy tworzenie obiektu jest skomplikowane lub wymaga nazwy - użyj metody wytwórczej.
     public static Polygon square(Segment diagonal, Style style) {
         Segment perp = diagonal.perpendicular();
         Point[] pts = {

@@ -1,11 +1,22 @@
-// Zadanie 1 + Zadanie 3
+// DZIEDZICZENIE: "extends Shape"
+// Polygon dziedziczy po Shape. Oznacza to że:
+//   1. Polygon JEST Shape (relacja "is-a") - możemy traktować Polygon jak Shape
+//   2. Polygon dostaje pole "style" z Shape (bo jest protected)
+//   3. Polygon MUSI zaimplementować toSvg() bo Shape tego wymaga (metoda abstrakcyjna)
+// Zasada: dziedzicz gdy klasa potomna "jest rodzajem" klasy bazowej.
+//         Polygon jest rodzajem Shape - ma sens.
+//         Gdyby Polygon "miał" Shape - użylibyśmy kompozycji, nie dziedziczenia.
+
 public class Polygon extends Shape {
 
     private static final Style DEFAULT_STYLE = new Style("none", "black", 1.0);
 
     private Point[] points;
 
-    // Zadanie 1 - konstruktor z Style
+    // WYWOŁANIE KONSTRUKTORA KLASY BAZOWEJ: super(...)
+    // Konstruktor klasy potomnej MUSI wywołać konstruktor klasy bazowej jako PIERWSZĄ instrukcję.
+    // super(...) przekazuje argumenty do konstruktora Shape.
+    // Zasada: zawsze wywołuj super() na początku konstruktora gdy dziedziczysz.
     public Polygon(Point[] points, Style style) {
         super(style != null ? style : DEFAULT_STYLE);
         this.points = new Point[points.length];
@@ -13,12 +24,10 @@ public class Polygon extends Shape {
             this.points[i] = new Point(points[i]);
     }
 
-    // Zadanie 1 - konstruktor bez Style (domyślny styl)
     public Polygon(Point[] points) {
         this(points, null);
     }
 
-    // Konstruktor kopiujący (głęboka kopia)
     public Polygon(Polygon other) {
         super(other.style);
         this.points = new Point[other.points.length];
@@ -34,7 +43,9 @@ public class Polygon extends Shape {
         return sb.toString();
     }
 
-    // Zadanie 1 - toSvg() uwzględnia styl
+    // @Override - adnotacja informująca że ta metoda NADPISUJE metodę z klasy bazowej (Shape).
+    // Kompilator sprawdzi czy taka metoda faktycznie istnieje w Shape - chroni przed literówkami.
+    // Zasada: zawsze pisz @Override gdy nadpisujesz metodę - to dobra praktyka.
     @Override
     public String toSvg() {
         StringBuilder sb = new StringBuilder("<polygon points=\"");
@@ -42,6 +53,7 @@ public class Polygon extends Shape {
             sb.append(points[i].getX()).append(",").append(points[i].getY());
             if (i < points.length - 1) sb.append(" ");
         }
+        // Używamy "style" z klasy Shape (pole protected - dostępne tutaj bo jesteśmy potomkiem)
         sb.append("\" ").append(style.toSvg()).append(" />");
         return sb.toString();
     }

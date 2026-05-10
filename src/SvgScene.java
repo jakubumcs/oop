@@ -1,9 +1,14 @@
 import java.io.FileWriter;
 import java.io.IOException;
 
-// Zadanie 4 - tablica Shape zamiast Polygon
 public class SvgScene {
 
+    // POLIMORFIZM W PRAKTYCE:
+    // Tablica przechowuje referencje typu Shape, ale mogą wskazywać na Polygon LUB Ellipse.
+    // Java "wie" w runtime jaki jest prawdziwy typ obiektu i wywoła właściwą metodę toSvg().
+    // Zasada: programuj do interfejsu/klasy bazowej (Shape), nie do konkretnych implementacji.
+    //         Dzięki temu SvgScene nie musi wiedzieć nic o Polygon ani Ellipse -
+    //         wystarczy że wie że każdy Shape ma toSvg().
     private Shape[] shapes = new Shape[3];
     private int index = 0;
 
@@ -11,7 +16,8 @@ public class SvgScene {
         addShape(polygon);
     }
 
-    // Zadanie 4 - ogólna metoda dodająca dowolny Shape
+    // Przyjmuje Shape - czyli może dostać Polygon, Ellipse, lub dowolny przyszły kształt
+    // bez zmiany tej metody. To jest siła polimorfizmu.
     public void addShape(Shape shape) {
         shapes[index % shapes.length] = shape;
         index++;
@@ -20,7 +26,13 @@ public class SvgScene {
     public String toSvg() {
         StringBuilder sb = new StringBuilder();
         for (Shape s : shapes) {
-            if (s != null) sb.append(s.toSvg()).append("\n");
+            if (s != null) {
+                // Tutaj działa polimorfizm:
+                // s.toSvg() wywoła Polygon.toSvg() jeśli s jest Polygon,
+                // albo Ellipse.toSvg() jeśli s jest Ellipse.
+                // My nie musimy sprawdzać typu - Java robi to automatycznie.
+                sb.append(s.toSvg()).append("\n");
+            }
         }
         return sb.toString();
     }
@@ -28,6 +40,10 @@ public class SvgScene {
     public void save(String path) throws IOException {
         double maxX = 0, maxY = 0;
         for (Shape s : shapes) {
+            // "instanceof" sprawdza czy obiekt jest danego typu.
+            // Używamy go tylko tam gdzie MUSIMY znać konkretny typ (tu: by wywołać boundingBox()).
+            // Zasada: unikaj instanceof gdzie możliwe - to sygnał że polimorfizm mógłby pomóc.
+            //         Tutaj Ellipse nie ma boundingBox(), więc musimy sprawdzić typ.
             if (s instanceof Polygon p) {
                 BoundingBox bb = p.boundingBox();
                 if (bb.x() + bb.width()  > maxX) maxX = bb.x() + bb.width();
