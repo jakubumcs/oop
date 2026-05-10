@@ -1,22 +1,27 @@
 public class Segment {
 
-    public Point start;
-    public Point end;
+    // Zadanie 2 - prywatne pola
+    private Point start;
+    private Point end;
 
-    // Zadanie 4 - konstruktor
+    // Zadanie 2 - konstruktor z głęboką kopią (niewrażliwość na zmianę zewnętrznych punktów)
     public Segment(Point start, Point end) {
-        this.start = start;
-        this.end = end;
+        this.start = new Point(start);
+        this.end = new Point(end);
     }
 
-    // Zadanie 4 - length()
     public double length() {
-        double dx = end.x - start.x;
-        double dy = end.y - start.y;
+        double dx = end.getX() - start.getX();
+        double dy = end.getY() - start.getY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // Zadanie 5 - longest() (przeniesione z Main do Segment)
+    // Zadanie 2 - toString()
+    @Override
+    public String toString() {
+        return "Segment(" + start + " -> " + end + ")";
+    }
+
     public static Segment longest(Segment[] segments) {
         if (segments == null || segments.length == 0) {
             throw new IllegalArgumentException("Tablica odcinków jest pusta.");
@@ -28,10 +33,5 @@ public class Segment {
             }
         }
         return maxSegment;
-    }
-
-    @Override
-    public String toString() {
-        return "Segment(" + start + " -> " + end + ")";
     }
 }
